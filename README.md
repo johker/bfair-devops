@@ -1,4 +1,4 @@
 bfair-devops
 ============
 
-Environment managed with Vagrant / Puppet
+Environments managed with Vagrant / Puppet
