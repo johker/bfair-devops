@@ -1,0 +1,3 @@
+node 'bfair' {
+	include nodejs
+}
