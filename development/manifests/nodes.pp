@@ -1,3 +1,0 @@
-node 'bfair' {
-	include nodejs
-}
