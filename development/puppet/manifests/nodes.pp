@@ -5,7 +5,7 @@ node 'bfair' {
 		port                    => '5672',
 		service_manage          => true,
 		environment_variables   => {
-			'RABBITMQ_NODENAME'     => 'server',
+			'RABBITMQ_NODENAME'     => 'rabbit',
 			'RABBITMQ_SERVICENAME'  => 'rabbitMQ'
 		}
 	}
@@ -14,4 +14,8 @@ node 'bfair' {
 		  port    => 27018,
 		  verbose => true,
 	}
+			
+	class { git::clone: 
+		repo => 'bfair' 
+	}	
 }
