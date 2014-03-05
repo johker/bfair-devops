@@ -1,4 +1,5 @@
-class { 'java': }
+
+
 
 $repo1 = {
   id       => 'myrepo',

@@ -1,8 +1,7 @@
 #
 # Cloning core and pricing repositories
 #
-class bfair_checkout {
-  $username = 'bfairdev'
+class bfair_checkout($username) {  
   $group = $username
 
   group { $username:

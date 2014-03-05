@@ -30,6 +30,7 @@
 #
 class maven::maven(
   $version = '3.0.5',
+  $java_home = "/usr/lib/jvm/java",
   $repo = {
     #url      => 'http://repo1.maven.org/maven2',
     #username => '',

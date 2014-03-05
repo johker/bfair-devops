@@ -1,4 +1,4 @@
-class { 'rabbitmq::server':
+class { 'rabbitmq::service':
     config_stomp => true,
 }
 

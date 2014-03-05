@@ -1,7 +1,7 @@
 # PRIVATE CLASS: do not use directly
 class mongodb::params inherits mongodb::globals {
   $ensure           = true
-  $service_status   = $service_status
+  $service_status   = $mongodb::globals::service_status
   $ensure_client    = true
 
   # Amazon Linux's OS Family is 'Linux', operating system 'Amazon'.

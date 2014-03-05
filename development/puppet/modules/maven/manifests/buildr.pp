@@ -26,7 +26,6 @@ class maven::buildr( $java_home ) {
   # }
 
   # a workaround using exec
-
   notice('Installing buildr')
 
   package { 'rake':
@@ -35,6 +34,8 @@ class maven::buildr( $java_home ) {
   }
   maven::install_gem { 'buildr' :
     version => '1.4.5',
+    java_home => $java_home,
     require => Package['rake'],
+    
   }
 }
