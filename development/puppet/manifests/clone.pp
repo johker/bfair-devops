@@ -23,7 +23,7 @@ class bfair_checkout($username) {
     ensure => directory,
     group  => $username,
     owner  => $username,
-    mode   => 0755,
+    mode   => 777,
   }
 
   file { '/home/${username}':
@@ -54,5 +54,8 @@ class bfair_checkout($username) {
     source   => "https://github.com/johker/bfair_pricing.git",
     revision => 'master',
   }
+  
+  
+  
   
 }

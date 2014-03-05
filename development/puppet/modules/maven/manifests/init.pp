@@ -33,8 +33,6 @@
 #
 class maven() {
 
-  notice('Installing Maven module pre-requisites')
-
   class { 'maven::maven': }
 
 }
