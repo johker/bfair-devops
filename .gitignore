@@ -1,2 +1,5 @@
-.project	
-.tar.gz
+*.project	
+*.tar.gz
+*.tar
+*.gz
+software/

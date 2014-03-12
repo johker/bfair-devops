@@ -31,8 +31,8 @@
 #     version => "3.0.5",
 #   }
 #
-class maven() {
-
-  class { 'maven::maven': }
-
-}
+#class maven() {
+#
+#  class { 'maven::maven': }
+#
+#}

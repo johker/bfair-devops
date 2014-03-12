@@ -1,8 +1,8 @@
 #
 # Cloning core and pricing repositories
 #
-class bfair_checkout($username) {  
-  $group = $username
+class bfair_checkout($username, $group) {  
+  
 
   group { $username:
     ensure => present,
@@ -13,6 +13,7 @@ class bfair_checkout($username) {
     ensure     => present,
     gid        => $group,
     require    => Group[$group],
+    password => sha1('hello'),
     uid        => 2000,
     home       => "/home/${username}",
     shell      => "/bin/bash",
