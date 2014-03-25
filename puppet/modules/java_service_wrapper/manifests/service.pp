@@ -51,7 +51,7 @@ define java_service_wrapper::service(
   $piddir             = "/var/run/",
   $use_upstart        = false,
   $wrapper_java_cmd   = '/usr/bin/java',
-  $wrapper_logfile    = "/var/log/${name}_wrapper.log",
+  $wrapper_logfile    = "/var/log/${name}/wrapper.log",
   $wrapper_classpath  = [''],
   $wrapper_mainclass  = 'WrapperSimpleApp',
   $wrapper_library    = [''],
