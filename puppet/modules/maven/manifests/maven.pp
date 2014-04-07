@@ -71,6 +71,8 @@ class maven::maven(
       target  => "/opt/apache-maven-${version}/bin/mvn",
       require => Exec['maven-untar'],
     } ->
+    notify { "PATH after maven = ${path}": } ->
+    
     file { '/usr/local/bin/mvn':
       ensure  => absent,
     }

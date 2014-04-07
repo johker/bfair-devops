@@ -1,3 +1,4 @@
 ---
 messageEnv: 'admin'
 
+nodeEnv: 'node_env'

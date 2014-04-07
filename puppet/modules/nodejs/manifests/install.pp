@@ -40,6 +40,7 @@ define nodejs::install (
     default   => $version
   }
 
+
   $node_target_dir = $target_dir ? {
     undef   => $::nodejs::params::target_dir,
     default => $target_dir

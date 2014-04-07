@@ -4,5 +4,4 @@
   :datadir: /vagrant/puppet/hieradata
 :hierarchy: 
   - "%{::fqdn}"
-  - "%{::environment}"
   - common
