@@ -9,9 +9,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   
   config.vm.box = "bfair"
   if vconfig['uselocalbox']
-  	config.vm.box_url = "file://" + vconfig['boxpath'] + "precise64.box"
+  	config.vm.box_url = "file://" + vconfig['boxpath'] + "precise64.box"  
   else
-  	config.vm.box_url = "http://puppet-vagrant-boxes.puppetlabs.com/ubuntu-server-12042-x64-vbox4210.box"
+  	config.vm.box.url = "http://puppet-vagrant-boxes.puppetlabs.com/ubuntu-server-12042-x64-vbox4210.box"
   end
   config.vm.hostname = "bfair.local"  
   config.vm.network :private_network, ip: "192.168.33.10"
@@ -47,17 +47,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   	end
   
 
-  # Puppet Update to newest version / Update package curl
-  config.vm.provision :shell, :path => "scripts/puppet.sh"
   # Symlink for hiera.yaml
   config.vm.provision :shell, :path => "scripts/hiera.sh"
-  # Curl is required for RabbitMQ
-  config.vm.provision :shell, :inline => "sudo apt-get install --yes curl"   
   
-  
-  
-  # Puppet 
-  config.vm.provision :puppet do |puppet|
+ # Puppet 
+  	config.vm.provision :puppet do |puppet|
     puppet.manifests_path 		= "puppet/manifests"
     puppet.manifest_file 		= "bfair.pp"
 	puppet.module_path 			= "puppet/modules"

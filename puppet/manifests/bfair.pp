@@ -18,22 +18,25 @@ node 'bfair.local' {
 
   file { "/opt/env.sh":
     mode    => 777,
-    content => "export JAVA_HOME=${java_home}\nexport PATH=\$PATH:\$JAVA_HOME/bin\nexport M2_HOME=/opt/apache-maven-${maven_version}\nexport M2=%M2_HOME%/bin"
+    content => "export JAVA_HOME=${java_home}\nexport PATH=\$PATH:\$JAVA_HOME/bin\n"
   } ->
   exec { "set_variables":
     command   => "/bin/bash /opt/env.sh",
     logoutput => true,
   } ->
+  
   # Wrapper Script for Puppet Apply Command
   file { '/usr/local/bin/papply':
     mode    => 777,
     content => "#!/bin/sh\nsudo puppet apply /vagrant/puppet/manifests/bfair.pp --hiera_config=/vagrant/puppet/hiera.yaml --profile --logdest=/var/log/puppet_apply.log --logdest=console --modulepath=/vagrant/puppet/modules --graph $*",
   } ->
+  
   # Set User and Group
   group { $group:
     ensure => present,
     gid    => 2000,
   } ->
+  
   user { $user:
     ensure     => present,
     gid        => $group,
@@ -44,6 +47,7 @@ node 'bfair.local' {
     shell      => "/bin/bash",
     managehome => true,
   } ->
+  
   # Java Installation
   jdk7::install7 { 'jdk1.7.0_51':
     version              => "7u51",
@@ -54,6 +58,7 @@ node 'bfair.local' {
     urandomJavaFix       => true,
     sourcePath           => "/vagrant/software",
   } ->
+  
   file { '/opt/code':
     ensure => directory,
     group  => $group,
@@ -76,6 +81,16 @@ node 'bfair.local' {
     source   => "https://github.com/johker/bfair.git",
     revision => 'master',
   } ->
+  
+  # Package Install based on package.json
+  exec { "npm_install":
+      command   => "npm install",
+      cwd       => "/opt/code/bfair",
+      user      => root,
+      path      => "${path}",
+      logoutput => true,
+   } ->
+    
   vcsrepo { "/opt/code/bfair_pricing":
     ensure   => latest,
     owner    => $user,
@@ -86,23 +101,17 @@ node 'bfair.local' {
     revision => 'master',
   } ->
   package { 'curl': ensure => present } ->
+  
   # RabbitMQ Installation including Management Console
   class { 'rabbitmq':
     port         => '5672',
     admin_enable => true,
   } ->
-  # RabbitMQ Installation including Management Console
-  #  class { 'rabbitmq':
-  #   port                    => '5672',
-  #   service_manage          => true,
-  #   environment_variables   => {
-  #     'RABBITMQ_NODENAME'     => 'server',
-  #     'RABBITMQ_SERVICENAME'  => 'rabbitMQ'
-  #   }
-  # } ->
-  #
- 
-  notify { "PATH = ${path}": } ->
+  
+  notify { "PATH = ${path}": 
+    
+  } ->
+  
   # Make sure target directory exists
   file { "/opt/code/bfair_pricing/target":
     ensure  => "directory",
@@ -112,29 +121,13 @@ node 'bfair.local' {
     group   => $group,
     mode    => "0755",
   } ->
-  # Maven Build File
-#  file { '/usr/local/bin/buildpr':
-#    mode    => 777,
-#    owner   => $user,
-#    group   => $group,
-#    content => "#!/bin/sh\nmvn package -f /opt/code/bfair_pricing/pom.xml",
-#  } ->
-#  exec { "build_pricing_app":
-#    command   => "/bin/bash /usr/local/bin/buildpr",
-#    logoutput => true,
-#  } ->
-
   file { "/var/log/bfairpricing":
     ensure => "directory",
     owner  => $user,
     group  => $group,
     mode   => "0755",
   } ->
-   # Maven Installation
-  class { 'maven::maven':
-    version   => $maven_version,
-    java_home => $java_home
-  } ->
+  
   # Maven package - direct call: uknown commmand mvn on initial call
     exec { "maven_build":
          command => "mvn package -f /opt/code/bfair_pricing/pom.xml",
@@ -142,7 +135,7 @@ node 'bfair.local' {
          group   => $group,
          path    => "${path}",
          logoutput => true
-     } ->
+   } ->
      
   # Run pricing jar as service
   java_service_wrapper::service { 'bfairpricing':
@@ -154,34 +147,7 @@ node 'bfair.local' {
     wrapper_classpath  => ['/usr/local/lib/wrapper.jar', "/opt/code/bfair_pricing/target/${application_name}"],
     wrapper_parameter  => ["/opt/code/bfair_pricing/target/${application_name}"],
   } ->
-  # Node js install
-  class { 'nodejs':
-    version  => $nodeVersion,
-    with_npm => true
-  } ->
-  # Package Install based on package.json
-  #  exec { "npm_install":
-  #    command   => "npm install",
-  #    cwd       => "/opt/code/bfair",
-  #    timeout   => 100,
-  #    user      => root,
-  #    path      => ["/usr/local/bin/", "/usr/local/node/node-v0.10.26/bin"],
-  #    logoutput => true,
-  #  } ->
-  # NPM Install File
-  file { '/usr/local/bin/npminst':
-    mode    => 777,
-    owner   => $user,
-    group   => $group,
-    content => "#!/bin/sh\nnpm install\nll",
-  } ->
-  exec { "exec_npm_install":
-    command   => "/bin/bash /usr/local/bin/npminst",
-    cwd       => '/opt/code/bfair',
-    user      => $user,
-    logoutput => true,
-    path      => "${path}",
-  } ->
+ 
   # Chown MongoDB dir
   file { "/data/db":
     ensure  => "directory",
