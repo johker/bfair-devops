@@ -131,6 +131,7 @@ node 'bfair.local' {
   # Maven package - direct call: uknown commmand mvn on initial call
     exec { "maven_build":
          command => "mvn package -f /opt/code/bfair_pricing/pom.xml",
+         timeout  => 600, 
          user    => $user,
          group   => $group,
          path    => "${path}",
@@ -155,34 +156,76 @@ node 'bfair.local' {
     group   => $group,
     recurse => true,
     purge   => true,
+    force   => true,
     mode    => "0755"
   } ->
-  # MongoDB Installation
-  class { '::mongodb::server':
-    port    => 27018,
-    user    => $user,
-    group   => $group,
-    verbose => true
+  
+  file_line { 'mongodb_rest':
+	  path  => '/etc/mongod.conf',
+	  line  => 'rest = true',
+	  match => 'rest*',
+	} ->
+	
+	file_line { 'mongodb_http':
+    path  => '/etc/mongod.conf',
+    line  => 'nohttpinterface = false',
+    match => 'nohttpinterface*',
   } ->
+  
   exec { "launch_mongodb":
-    command   => "mongod --port 27018",
-    timeout   => 100,
-    user      => $user,
-    group     => $group,
+    command   => "service mongod restart",
+    user      => root,
     path      => "${path}",
     logoutput => true,
-  } # ->
-
+  }  ->
+  
+  # Chown MongoDB dir
+  file { "/opt/code/bfair/logs":
+    ensure  => "directory",
+    owner   => $user,
+    group   => $group,
+    recurse => true,
+    purge   => true,
+    mode    => "0755"
+  } ->
+  
   # Enter users
-  #    exec { "setup_users":
-  #        command       => "node setup_users.js",
-  #        environment  =>  "NODE_ENV=development",
-  #        cwd           => "/opt/code/bfair/setup",
-  #        user          => $user,
-  #        group         => $group,
-  #        path          => "${path}",
-  #        logoutput     => true,
-  #        require       => [Exec["launch_mongodb"], Exec["npm_install"]]
-  #    }
+  exec { "setup_users":
+    command       => "node setup_users.js",
+    environment  =>  "NODE_ENV=development",
+    cwd           => "/opt/code/bfair/setup",
+    user          => $user,
+    group         => $group,
+    logoutput     => true,          
+  } ->
+  
+  # Enter users
+#  exec { "setup_accounts":
+#    command       => "node setup_accounts.js",
+#    environment  =>  "NODE_ENV=development",
+#    cwd           => "/opt/code/bfair/setup",
+#    user          => $user,
+#    group         => $group,
+#    logoutput     => true,          
+#  } ->
+  
+    # Package Install based on package.json
+  exec { "npm_install_forever":
+      command   => "npm install -g forever",
+      user      => root,
+      path      => "${path}",
+      logoutput => true,
+   } -> 
+   
+   # Enter users
+  exec { "start_bfair_core":
+    command       => "forever server.js &",
+    environment  =>  "NODE_ENV=development",
+    cwd           => "/opt/code/bfair",
+    user          => root,
+    logoutput     => true,          
+  } # ->
+    
+  
 }
 
