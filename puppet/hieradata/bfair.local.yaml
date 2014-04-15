@@ -1,4 +1,2 @@
 ---
-messageEnv: 'admin'
-
-nodeEnv: 'node_env'
+nodeEnv: 'development'

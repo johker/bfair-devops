@@ -1,5 +1,6 @@
 
-node 'bfair.local' {
+node 'bfair.local', 'bfair.aws'   {
+  
   contain jdk7
   contain java_service_wrapper
 
@@ -15,7 +16,11 @@ node 'bfair.local' {
   $application_name = hiera('bf_app_name')
   $nodeEnv = hiera('node_env')
   $nodeVersion = hiera('node_version')
-
+  
+  notify { "FQDN = ${fqdn}": 
+    
+  } ->
+  
   file { "/opt/env.sh":
     mode    => 777,
     content => "export JAVA_HOME=${java_home}\nexport PATH=\$PATH:\$JAVA_HOME/bin\n"
@@ -192,7 +197,7 @@ node 'bfair.local' {
   # Enter users
   exec { "setup_users":
     command       => "node setup_users.js",
-    environment  =>  "NODE_ENV=development",
+    environment  =>  "NODE_ENV=${nodeEnv}",
     cwd           => "/opt/code/bfair/setup",
     user          => $user,
     group         => $group,
