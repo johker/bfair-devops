@@ -15,13 +15,14 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 		# AWS Provider Configuration
 		config.vm.define :web_aws do |web|
 			web.vm.hostname = "bfair.aws" 
-			web.vm.box_url = "file://" + vconfig['aws']['boxpath'] + "local.box"
+			web.vm.box_url = "file://" + vconfig['aws']['boxpath'] + vconfig['aws']['box']
 			web.vm.provider :aws do |aws,override|
 		    	aws.access_key_id = vconfig['aws']['accesskey']
 		    	aws.secret_access_key = vconfig['aws']['secretkey']
-		    	aws.keypair_name = "bfairkeys"
 		    	aws.region = "eu-west-1"
-		    	aws.ami = "ami-ff68f8cf" # Ubuntu 12.04LTS in us-west-2"
+		    	aws.instance_type = "t1.micro"
+		    	aws.keypair_name = "vagrantaws"
+		    	aws.ami = "ami-cd6c97ba" # Ubuntu Server 12.04 LTS - EU West (Ireland)
 		    	override.ssh.username = "ubuntu"
 		    	override.ssh.private_key_path = vconfig['aws']['privatekey']
 			end	    
@@ -29,7 +30,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	# Development:
 	else	
 	
-		# Virtual Box Provider Configuration
+		# VirtualBox Provider Configuration
 		config.vm.define :local_vb do |local|
 			local.vm.hostname = "bfair.local" 
 	  		if vconfig['local']['usebuild']
