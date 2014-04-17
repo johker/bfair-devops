@@ -1,5 +1,5 @@
 
-node 'bfair.local', 'bfair.aws'   {
+node default   {
   
   contain jdk7
   contain java_service_wrapper
