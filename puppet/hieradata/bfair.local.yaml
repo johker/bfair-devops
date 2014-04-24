@@ -1,2 +1,4 @@
 ---
 nodeEnv: 'development'
+
+software_dir:     '/vagrant/software'

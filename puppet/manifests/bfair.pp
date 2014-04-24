@@ -9,13 +9,14 @@ node default   {
   Exec {
     path => ["/bin/", "/sbin/", "/usr/bin/", "/usr/sbin/", "/usr/local/bin/"] }
 
-  $user = hiera('bf_os_user')
-  $group = hiera('bf_os_group')
-  $maven_version = hiera('bf_mvn_version')
-  $java_home = hiera('bf_java_home_dir')
-  $application_name = hiera('bf_app_name')
-  $nodeEnv = hiera('node_env')
-  $nodeVersion = hiera('node_version')
+  $user = hiera('bf_os_user', 'bfairdev')
+  $group = hiera('bf_os_group', 'bfairdev')
+  $maven_version = hiera('bf_mvn_version', '3.0.5')
+  $java_home = hiera('bf_java_home_dir', '/usr/java/jdk1.7.0_51')
+  $application_name = hiera('bf_app_name', 'pricing-0.1.jar')
+  $nodeEnv = hiera('node_env', 'development')
+  $nodeVersion = hiera('node_version', 'v0.10.26')
+  $swDepot = hiera('software_dir', '/opt/software')
   
   notify { "FQDN = ${fqdn}": 
     
@@ -61,7 +62,7 @@ node default   {
     x64                  => true,
     downloadDir          => "/data/install",
     urandomJavaFix       => true,
-    sourcePath           => "/vagrant/software",
+    sourcePath           => $swDepot,
   } ->
   
   file { '/opt/code':
@@ -126,6 +127,7 @@ node default   {
     group   => $group,
     mode    => "0755",
   } ->
+  
   file { "/var/log/bfairpricing":
     ensure => "directory",
     owner  => $user,
@@ -194,6 +196,14 @@ node default   {
     mode    => "0755"
   } ->
   
+   # Create node log dirs
+   file { "/var/log/bfair":
+    ensure => "directory",
+    owner  => $user,
+    group  => $group,
+    mode   => "0755",
+  } ->
+  
   # Enter users
   exec { "setup_users":
     command       => "node setup_users.js",
@@ -222,7 +232,7 @@ node default   {
       logoutput => true,
    } -> 
    
-   # Enter users
+   # Start
   exec { "start_bfair_core":
     command       => "forever server.js &",
     environment  =>  "NODE_ENV=development",
